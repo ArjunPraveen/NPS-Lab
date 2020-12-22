@@ -1,123 +1,160 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#define MAXSIZE 90
-
-int isPalindrome(char str[])
-{
-
-    int l = 0;
-    int h = strlen(str) - 1;
-
-    while (h > l)
-    {
-        if (str[l++] != str[h--])
-            return 0;
-    }
-    //printf("Palindrome : True\n");
-    return 1;
-}
+#include <stdlib.h>
+#include <stdio.h>
 
 int main()
 {
-    int sockfd, newsockfd, retval, i;
-    socklen_t actuallen;
-    int recedbytes, sentbytes;
-    struct sockaddr_in serveraddr, clientaddr;
+    int s, r, recb, sntb, x, ns, a = 0;
+    printf("INPUT port number: ");
+    scanf("%d", &x);
+    socklen_t len;
+    struct sockaddr_in server, client;
+    char buff[50];
 
-    char buff[MAXSIZE];
-    char output[MAXSIZE];
-    int a = 0;
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    if (sockfd == -1)
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    if (s == -1)
     {
-        printf("\nSocket creation error");
+        printf("\nSocket creation error.");
+        exit(0);
     }
-    clientaddr.sin_family = AF_INET;
-    clientaddr.sin_port = htons(3389);
-    clientaddr.sin_addr.s_addr = htons(INADDR_ANY);
+    printf("\nSocket created.");
 
-    serveraddr.sin_family = AF_INET;
-    serveraddr.sin_port = htons(3388);
-    serveraddr.sin_addr.s_addr = htons(INADDR_ANY);
+    server.sin_family = AF_INET;
+    server.sin_port = htons(x);
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    retval = bind(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
-    if (retval == 1)
+    r = bind(s, (struct sockaddr *)&server, sizeof(server));
+    if (r == -1)
     {
-        printf("Binding error");
-        close(sockfd);
+        printf("\nBinding error.");
+        exit(0);
     }
+    printf("\nSocket binded.");
 
-    while (1)
+    r = listen(s, 1);
+    if (r == -1)
     {
+        close(s);
+        exit(0);
+    }
+    printf("\nSocket listening.");
 
-        actuallen = sizeof(clientaddr);
-        recedbytes = recvfrom(sockfd, buff, sizeof(buff), 0, (struct sockaddr *)&clientaddr, &actuallen);
+    len = sizeof(client);
 
-        if (recedbytes == -1)
+    ns = accept(s, (struct sockaddr *)&client, &len);
+    if (ns == -1)
+    {
+        close(s);
+        exit(0);
+    }
+    printf("\nSocket accepting.");
+    char arr[50];
+    int arr1[50], arr2[50];
+    recb = recv(ns, arr, sizeof(arr), 0);
+    if (recb == -1)
+    {
+        printf("\nMessage Recieving Failed");
+        close(s);
+        close(ns);
+        exit(0);
+    }
+    printf("\n\nArray of numbers received!\n");
+    int ch = 1, n, num = 1;
+    while (ch != 5)
+    {
+        recb = recv(ns, buff, sizeof(buff), 0);
+        if (recb == -1)
         {
-            printf("Reciving error\n");
-            close(sockfd);
+            printf("\nMessage Recieving Failed");
+            close(s);
+            close(ns);
+            exit(0);
         }
-
-        puts(buff);
-        printf("\n");
-
-        if ((buff[0] == 'H' || buff[0] == 'h') && buff[1] == 'a' && buff[2] == 'l' && buff[3] == 't')
+        n = buff[0];
+        ch = buff[1];
+        if (ch != 5)
+            printf("\nProcessing request..\n");
+        int l = 0, k = 0, x;
+        switch (ch)
         {
-            break;
-        }
-        int check = isPalindrome(buff);
-
-        if (!check)
-        {
-            int i = 0; //start at 0
-            char test[] = "Palindrome : False";
-            puts(test);
-            strcpy(output, test);
-        }
-        else
-        {
-            int i = 0, c = 0, count = 0; //start at 0
-            char test[] = "Palindrome : True";
-            puts(test);
-            strcpy(output, test);
-            char len[MAXSIZE], countstr[MAXSIZE], space[] = " ";
-            sprintf(len, "%ld", strlen(buff));
-            strcat(output, space);
-            //puts(output );
-            strcat(output, len);
-            puts(output);
-            while (buff[c] != '\0')
+        case 1:
+            num = buff[2];
+            for (x = 0; x < n; x++)
             {
-                if (buff[c] == 'a' || buff[c] == 'A' || buff[c] == 'e' || buff[c] == 'E' || buff[c] == 'i' || buff[c] == 'I' || buff[c] == 'o' || buff[c] == 'O' || buff[c] == 'u' || buff[c] == 'U')
-                    count++;
-                c++;
+                if (arr[x] == num)
+                    break;
             }
-            sprintf(countstr, "%d", count);
-            strcat(output, space);
-            strcat(output, countstr);
-        }
-
-        //scanf("%s", buff);
-        sentbytes = sendto(sockfd, output, sizeof(buff), 0, (struct sockaddr *)&clientaddr, sizeof(clientaddr));
-        if (sentbytes == -1)
-        {
-            printf("sending error");
-            close(sockfd);
-        }
-
-        if ((buff[0] == 'H' || buff[0] == 'h') && buff[1] == 'a' && buff[2] == 'l' && buff[3] == 't')
-        {
+            printf("\nProcessing done!");
+            if (x == n)
+                printf("\nElement does not exist!");
+            else
+                printf("\nElement exists at %d position.", x + 1);
+            printf("\n\n");
+            break;
+        case 2:
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = 0; j < n - i - 1; j++)
+                {
+                    if (arr[j] > arr[j + 1])
+                    {
+                        int temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                }
+            }
+            printf("\nProcessing done!");
+            printf("\nSorted array is: \n");
+            for (int i = 0; i < n; i++)
+                printf("%d  ", arr[i]);
+            printf("\n\n");
+            break;
+        case 3:
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = 0; j < n - i - 1; j++)
+                {
+                    if (arr[j] < arr[j + 1])
+                    {
+                        int temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                }
+            }
+            printf("\nProcessing done!");
+            printf("\nSorted array is: \n");
+            for (int i = 0; i < n; i++)
+                printf("%d  ", arr[i]);
+            printf("\n\n");
+            break;
+        case 4:
+            printf("\nProcessing done!");
+            printf("\nEven array is: \n");
+            for (int i = 0; i < n; i++)
+            {
+                if (arr[i] % 2 == 0)
+                    printf("%d ", arr[i]);
+            }
+            printf("\n\nOdd array is: \n");
+            for (int i = 0; i < n; i++)
+            {
+                if (arr[i] % 2 != 0)
+                    printf("%d ", arr[i]);
+            }
+            printf("\n\n");
+            break;
+        case 5:
+            break;
+        default:
             break;
         }
     }
-
-    close(sockfd);
-    close(newsockfd);
+    close(ns);
+    close(s);
 }

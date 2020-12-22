@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 int main()
 {
-    int s, r, recb, sntb, x;
+    int s, r, recb, sntb, x, i;
     printf("INPUT port number: ");
     scanf("%d", &x);
     struct sockaddr_in server;
@@ -61,6 +61,7 @@ int main()
         scanf("%d", &ch);
         buff[0] = n;
         buff[1] = ch;
+        int rcvb;
         switch (ch)
         {
         case 1:
@@ -74,6 +75,17 @@ int main()
                 printf("\nMessage Sending Failed");
                 exit(0);
             }
+            int ans;
+            rcvb = recv(s, &ans, sizeof(ans), 0);
+            if (ans == -1)
+            {
+                printf("Element not found\n");
+            }
+            else
+            {
+                printf("Element found at position %d", ans);
+            }
+
             break;
         case 2:
 
@@ -84,6 +96,10 @@ int main()
                 printf("\nMessage Sending Failed");
                 exit(0);
             }
+            rcvb = recv(s, buff, sizeof(buff), 0);
+
+            for (i = 0; i < n; i++)
+                printf("%d ", buff[i]);
             break;
         case 3:
 
@@ -94,6 +110,10 @@ int main()
                 printf("\nMessage Sending Failed");
                 exit(0);
             }
+            rcvb = recv(s, buff, sizeof(buff), 0);
+
+            for (i = 0; i < n; i++)
+                printf("%d ", buff[i]);
             break;
         case 4:
 

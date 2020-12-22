@@ -1,76 +1,143 @@
+#include <string.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
-#include <arpa/inet.h>
-#define MAXSIZE 50
-
+#include <sys/stat.h>
 int main()
 {
-    int sockfd, retval;
-    char buff[MAXSIZE];
-    int recedbytes, sentbytes;
-    struct sockaddr_in serveraddr, clientaddr;
-    /**
-        struct sockaddr_in {
-        short int            sin_family;
-        unsigned short int   sin_port;
-        struct in_addr       sin_addr;
-        unsigned char        sin_zero[8];
-        };
-     **/
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0); //returns non negative value on connection
-    if (sockfd == -1)
+    int s, r, recb, sntb, x;
+    printf("INPUT port number: ");
+    scanf("%d", &x);
+    struct sockaddr_in server;
+    char buff[50];
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    if (s == -1)
     {
-        printf("\nSocket Creation Error");
-        return 0;
+        printf("\nSocket creation error.");
+        exit(0);
     }
-    serveraddr.sin_family = AF_INET;
-    serveraddr.sin_port = htons(3388);                   // Host to Network ShortHost to Network Short
-    serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1"); //convert the string pointed to by cp, in the standard IPv4 dotted decimal notation
+    printf("\nSocket created.");
 
-    clientaddr.sin_family = AF_INET;
-    clientaddr.sin_port = htons(3389);
-    clientaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server.sin_family = AF_INET;
+    server.sin_port = htons(x);
+    server.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    retval = bind(sockfd, (struct sockaddr *)&clientaddr, sizeof(clientaddr));
-    if (retval == 1)
+    r = connect(s, (struct sockaddr *)&server, sizeof(server));
+    if (r == -1)
     {
-        printf("Binding error");
-        close(sockfd);
+        printf("\nConnection error.");
+        exit(0);
     }
+    printf("\nSocket connected.");
 
-    while (1)
+    int ch = 1;
+    int a[50];
+    char arr[50];
+    int n;
+    printf("\n\nEnter the number of elements: ");
+    scanf("%d", &n);
+    printf("\nEnter the numbers: ");
+    int num = 0;
+    for (int i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+    for (int i = 0; i < n; i++)
+        arr[i] = a[i];
+    sntb = send(s, arr, sizeof(arr), 0);
+    if (sntb == -1)
     {
-        printf("Enter a string: \n");
-        scanf("%s", buff);
-
-        sentbytes = sendto(sockfd, buff, sizeof(buff), 0,
-                           (struct sockaddr *)&serveraddr, sizeof(serveraddr));
-
-        if (sentbytes == -1)
+        close(s);
+        printf("\nMessage Sending Failed");
+        exit(0);
+    }
+    while (ch != 5)
+    {
+        printf("\n\n");
+        printf("1.Search for a number\n2.Sort in ascending order\n3.Sort in descending order\n4.Split into even and odd arrays\n5.Exit\nEnter your choice: ");
+        scanf("%d", &ch);
+        buff[0] = n;
+        buff[1] = ch;
+        int rcvb;
+        switch (ch)
         {
-            printf("sending error");
-            close(sockfd);
-        }
+        case 1:
+            printf("\nEnter the number to be searched: ");
+            scanf("%d", &num);
+            buff[2] = num;
+            sntb = send(s, buff, sizeof(buff), 0);
+            if (sntb == -1)
+            {
+                close(s);
+                printf("\nMessage Sending Failed");
+                exit(0);
+            }
+            int ans;
+            rcvb = recv(s, &ans, sizeof(ans), 0);
+            if (ans == -1)
+            {
+                printf("Element not found\n");
+            }
+            else
+            {
+                printf("Element found at position %d", ans);
+            }
 
-        if ((buff[0] == 'H' || buff[0] == 'h') && buff[1] == 'a' && buff[2] == 'l' && buff[3] == 't')
-        {
             break;
-        }
-        int size = sizeof(serveraddr);
-        recedbytes = recvfrom(sockfd, buff, sizeof(buff), 0, (struct sockaddr *)&serveraddr, &size);
-        puts(buff);
-        printf("\n");
+        case 2:
 
-        if ((buff[0] == 'H' || buff[0] == 'h') && buff[1] == 'a' && buff[2] == 'l' && buff[3] == 't')
-        {
+            sntb = send(s, buff, sizeof(buff), 0);
+            if (sntb == -1)
+            {
+                close(s);
+                printf("\nMessage Sending Failed");
+                exit(0);
+            }
+            rcvb = recv(s, buff, sizeof(buff), 0);
+            int i;
+            for (i = 0; i < n; i++)
+                printf("%d ", buff[i]);
             break;
+        case 3:
+
+            sntb = send(s, buff, sizeof(buff), 0);
+            if (sntb == -1)
+            {
+                close(s);
+                printf("\nMessage Sending Failed");
+                exit(0);
+            }
+            rcvb = recv(s, buff, sizeof(buff), 0);
+            int i;
+            for (i = 0; i < n; i++)
+                printf("%d ", buff[i]);
+            break;
+        case 4:
+
+            sntb = send(s, buff, sizeof(buff), 0);
+            if (sntb == -1)
+            {
+                close(s);
+                printf("\nMessage Sending Failed");
+                exit(0);
+            }
+            break;
+        case 5:
+
+            sntb = send(s, buff, sizeof(buff), 0);
+            if (sntb == -1)
+            {
+                close(s);
+                printf("\nMessage Sending Failed");
+                exit(0);
+            }
+            break;
+        default:
+            printf("\nInvalid choice. Try again!");
         }
     }
-    close(sockfd);
+    close(s);
 }

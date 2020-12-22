@@ -85,14 +85,14 @@ int main()
         {
             int i = 0, c = 0, count = 0; //start at 0
             char test[] = "Palindrome : True";
-            puts(test);
+            //puts(test);
             strcpy(output, test);
             char len[MAXSIZE], countstr[MAXSIZE], space[] = " ";
             sprintf(len, "%ld", strlen(buff));
             strcat(output, space);
             //puts(output );
             strcat(output, len);
-            puts(output);
+            //puts(output);
             while (buff[c] != '\0')
             {
                 if (buff[c] == 'a' || buff[c] == 'A' || buff[c] == 'e' || buff[c] == 'E' || buff[c] == 'i' || buff[c] == 'I' || buff[c] == 'o' || buff[c] == 'O' || buff[c] == 'u' || buff[c] == 'U')

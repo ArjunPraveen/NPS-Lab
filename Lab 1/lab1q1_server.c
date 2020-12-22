@@ -78,7 +78,7 @@ int main()
         ch = buff[1];
         if (ch != 5)
             printf("\nProcessing request..\n");
-        int l = 0, k = 0, x;
+        int l = 0, k = 0, x, sntb;
         switch (ch)
         {
         case 1:
@@ -90,9 +90,19 @@ int main()
             }
             printf("\nProcessing done!");
             if (x == n)
+            {
                 printf("\nElement does not exist!");
+                int ans = -1;
+                sntb = send(ns, &ans, sizeof(int), 0);
+            }
+
             else
+            {
                 printf("\nElement exists at %d position.", x + 1);
+                int ans = x + 1;
+                sntb = send(ns, &ans, sizeof(int), 0);
+            }
+
             printf("\n\n");
             break;
         case 2:
@@ -108,6 +118,7 @@ int main()
                     }
                 }
             }
+            sntb = send(ns, arr, sizeof(arr), 0);
             printf("\nProcessing done!");
             printf("\nSorted array is: \n");
             for (int i = 0; i < n; i++)
@@ -127,6 +138,7 @@ int main()
                     }
                 }
             }
+            sntb = send(ns, arr, sizeof(arr), 0);
             printf("\nProcessing done!");
             printf("\nSorted array is: \n");
             for (int i = 0; i < n; i++)

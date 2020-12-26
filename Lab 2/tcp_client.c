@@ -77,9 +77,12 @@ int main()
             scanf("%s", str1);
             n = strlen(str1);
             buff[1] = n;
+            puts(buff);
             for (i = 0; i < n; i++)
                 buff[i + 2] = str1[i];
             buff[i + 2] = '\0';
+            puts(buff);
+            printf("%s", buff);
             sntb = send(s, buff, sizeof(buff), 0);
             if (sntb == -1)
             {
@@ -105,6 +108,7 @@ int main()
             for (i = 0; i < n; i++)
                 buff[i + 2] = str1[i];
             buff[i + 2] = '\0';
+            puts(buff);
             sntb = send(s, buff, sizeof(buff), 0);
             if (sntb == -1)
             {

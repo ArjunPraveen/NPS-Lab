@@ -133,6 +133,8 @@ int main()
             close(ns);
             exit(0);
         }
+        puts(buff);
+        printf("%d", buff[0]);
         ch = buff[0];
         int i, n, n1, n2, j;
         char str[50], str1[50], str2[50];
